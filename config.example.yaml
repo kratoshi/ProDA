@@ -1,0 +1,21 @@
+jira:
+  site: "your-company"          # https://<site>.atlassian.net
+  email: "${JIRA_EMAIL}"
+  api_token: "${JIRA_API_TOKEN}"
+  # base_url: "http://127.0.0.1:8765/rest/api/3"  # optional override (proxy/testing)
+
+ai:
+  enabled: true
+  base_url: "https://api.deepinfra.com/v1"
+  model: "deepseek-ai/DeepSeek-V4-Flash-0731"
+  api_key: "${DEEPINFRA_API_KEY}"
+
+reports_dir: "reports"
+data_dir: "data"
+
+projects:
+  - key: "ABC"
+    name: "Acme Backend"        # optional; defaults to the key
+    done_statuses: ["Done", "Closed"]
+    aging_days: 14              # flag open issues untouched for more than N days
+    # jql: "component = \"api\""  # optional extra JQL AND-clause

@@ -1,0 +1,17 @@
+pyproject.toml
+proda/__init__.py
+proda/ai.py
+proda/cli.py
+proda/config.py
+proda/fetcher.py
+proda/jira_client.py
+proda/metrics.py
+proda/report.py
+proda/snapshot.py
+proda.egg-info/PKG-INFO
+proda.egg-info/SOURCES.txt
+proda.egg-info/dependency_links.txt
+proda.egg-info/entry_points.txt
+proda.egg-info/requires.txt
+proda.egg-info/top_level.txt
+tests/test_pipeline.py
