@@ -28,7 +28,9 @@ class JiraClient:
     def __init__(self, site: str, email: str, api_token: str, verify_ssl: bool = True, timeout: int = 60, base_url: str | None = None):
         if not site or not email or not api_token:
             raise JiraError("jira config requires site, email and api_token (see .env)")
-        self.base = base_url.rstrip("/") if base_url else f"https://{site}.atlassian.net/rest/api/3"
+        self.base = base_url.rstrip("/") if base_url else (
+            f"https://{site}/rest/api/3" if "." in site else f"https://{site}.atlassian.net/rest/api/3"
+        )
         token = base64.b64encode(f"{email}:{api_token}".encode()).decode()
         self._session = requests.Session()
         self._session.headers.update(
@@ -38,20 +40,21 @@ class JiraClient:
         self._timeout = timeout
 
     def search(self, jql: str, max_results: int = 200) -> list[dict[str, Any]]:
-        """Paginate `/search` with `changelog` expansion for status transitions."""
+        """Paginate `POST /search/jql` with changelog expansion for status transitions."""
         issues: list[dict[str, Any]] = []
-        start = 0
+        next_token: str | None = None
         while True:
-            params = {
+            body: dict[str, Any] = {
                 "jql": jql,
-                "fields": ",".join(FIELDS),
+                "fields": FIELDS,
                 "expand": "changelog",
                 "maxResults": max_results,
-                "startAt": start,
             }
+            if next_token:
+                body["nextPageToken"] = next_token
             try:
-                resp = self._session.get(
-                    f"{self.base}/search", params=params, timeout=self._timeout, verify=self._verify_ssl
+                resp = self._session.post(
+                    f"{self.base}/search/jql", json=body, timeout=self._timeout, verify=self._verify_ssl
                 )
             except requests.RequestException as exc:
                 raise JiraError(f"Jira request failed: {exc}") from exc
@@ -65,9 +68,10 @@ class JiraClient:
             payload = resp.json()
             batch = payload.get("issues") or []
             issues.extend(batch)
-            total = payload.get("total", start + len(batch))
-            start += len(batch)
-            if not batch or start >= total:
+            if not batch or payload.get("isLast"):
+                return issues
+            next_token = payload.get("nextPageToken")
+            if not next_token:
                 return issues
 
 

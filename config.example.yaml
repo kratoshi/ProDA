@@ -1,5 +1,5 @@
 jira:
-  site: "your-company"          # https://<site>.atlassian.net
+  site: "${JIRA_SITE}"          # full host, e.g. your-company.atlassian.net
   email: "${JIRA_EMAIL}"
   api_token: "${JIRA_API_TOKEN}"
   # base_url: "http://127.0.0.1:8765/rest/api/3"  # optional override (proxy/testing)
