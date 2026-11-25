@@ -4,5 +4,7 @@ data/
 reports/
 __pycache__/
 *.pyc
+*.egg-info/
 .venv/
 .pytest_cache/
+.idea
